@@ -19,6 +19,7 @@ SET(CRYPTO ${CRYPTO} CACHE STRING "Choose the crypto of build: mbedtls openssl" 
 SET(GCOV ${GCOV} CACHE STRING "Choose the target of Gcov: ON  OFF, and default is OFF" FORCE)
 SET(STACK_USAGE ${STACK_USAGE} CACHE STRING "Choose the target of STACK_USAGE: ON  OFF, and default is OFF" FORCE)
 SET(BUILD_LINUX_SHARED_LIB ${BUILD_LINUX_SHARED_LIB} CACHE STRING "Choose if libspdm shared library should be built for linux: ON OFF, and default is OFF" FORCE)
+SET(USE_DEVICE_SECRET_LIB_SAMPLE ${USE_DEVICE_SECRET_LIB_SAMPLE} CACHE STRING "Choose whether to use libspdm_device_secret_lib_sample: ON OFF, and default is OFF" FORCE)
 
 if(NOT GCOV)
     SET(GCOV "OFF")
@@ -30,6 +31,10 @@ endif()
 
 if(NOT BUILD_LINUX_SHARED_LIB)
     SET(BUILD_LINUX_SHARED_LIB "OFF")
+endif()
+
+if(NOT USE_DEVICE_SECRET_LIB_SAMPLE)
+    SET(USE_DEVICE_SECRET_LIB_SAMPLE "OFF")
 endif()
 
 SET(LIBSPDM_DIR ${PROJECT_SOURCE_DIR})
@@ -1070,6 +1075,12 @@ else()
             $<TARGET_OBJECTS:spdm_crypt_ext_lib>
             $<TARGET_OBJECTS:cryptlib_${CRYPTO}>
         )
+
+        if(USE_DEVICE_SECRET_LIB_SAMPLE STREQUAL "ON")
+            TARGET_LINK_LIBRARIES(${LIB_NAME}
+                PUBLIC spdm_device_secret_lib_sample
+            )
+        endif()
 
         if(CRYPTO STREQUAL "mbedtls")
             SET(CRYPTO_DEPS "-lmbedtls -lmbedx509 -lmbedcrypto")
